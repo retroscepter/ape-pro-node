@@ -16,7 +16,8 @@
     "test:watch": "vitest --watch",
     "typecheck": "tsc --noEmit",
     "dev": "tsup --watch",
-    "build": "tsup"
+    "build": "tsup",
+    "release": "pnpm build && pnpm changeset publish"
   },
   "keywords": [
     "crypto",
