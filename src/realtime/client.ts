@@ -2,7 +2,6 @@ import EventEmitter from "eventemitter3";
 import { type ErrorEvent } from "undici-types";
 
 import { type Pool } from "~/types/pools";
-import { exhaustiveGuard } from "~/utils";
 
 import { REALTIME_WS_URL } from "./const";
 import { type GraduatedAction, type SwapAction } from "./types/actions";
@@ -120,9 +119,6 @@ export class RealtimeClient extends EventEmitter<RealtimeEvents> {
             case "update":
               this.emit("poolUpdate", item.pool);
               break;
-            default:
-              exhaustiveGuard(type);
-              break;
           }
         }
       }
@@ -141,9 +137,6 @@ export class RealtimeClient extends EventEmitter<RealtimeEvents> {
               break;
             case "graduated":
               this.emit("graduated", action);
-              break;
-            default:
-              exhaustiveGuard(type);
               break;
           }
         }
