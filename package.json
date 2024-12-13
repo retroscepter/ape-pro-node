@@ -1,6 +1,6 @@
 {
   "name": "ape.pro",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "JavaScript API client for ape.pro.",
   "type": "module",
   "exports": {
