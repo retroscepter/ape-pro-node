@@ -30,6 +30,7 @@
     "url": "https://retroscepter.com"
   },
   "license": "MIT",
+  "packageManager": "pnpm@9.15.0",
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": [
       "eslint . --fix",
