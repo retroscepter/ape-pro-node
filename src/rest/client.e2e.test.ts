@@ -2,6 +2,7 @@ import * as dateFns from "date-fns";
 import { describe, expect, expectTypeOf, it } from "vitest";
 
 import { RestClient } from "./client";
+import { type GetGemsFilters, type GetGemsResponse } from "./types/gems";
 import { type LeaderboardResponse } from "./types/leaderboard";
 import { type GetPoolsResponse, type PoolSortBy } from "./types/pools";
 import { type Portfolio } from "./types/portfolios";
@@ -9,28 +10,27 @@ import { type Portfolio } from "./types/portfolios";
 const SOL_ASSET_ID = "So11111111111111111111111111111111111111112";
 const JUP_ASSET_ID = "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN";
 
-const SORT_BY_OPTIONS: PoolSortBy[] = [
-  "listedTime",
-  "mcap",
-  "volume5m",
-  "volume1h",
-  "volume6h",
-  "volume24h",
-  "txs5m",
-  "txs1h",
-  "txs6h",
-  "txs24h",
-  "liquidity",
-];
-
-const SORT_DIR_OPTIONS = ["asc", "desc"] as const;
-
 const oneDayAgo = dateFns.subDays(new Date(), 1);
 
 describe("RestClient", () => {
   const client = new RestClient();
 
   describe("getPools", () => {
+    const SORT_BY_OPTIONS: PoolSortBy[] = [
+      "listedTime",
+      "mcap",
+      "volume5m",
+      "volume1h",
+      "volume6h",
+      "volume24h",
+      "txs5m",
+      "txs1h",
+      "txs6h",
+      "txs24h",
+      "liquidity",
+    ];
+    const SORT_DIR_OPTIONS = ["asc", "desc"] as const;
+
     it("should return no pools when no params are provided", async () => {
       const response = await client.getPools();
 
@@ -151,5 +151,103 @@ describe("RestClient", () => {
 
       expectTypeOf(response).toEqualTypeOf<Portfolio>();
     });
+  });
+
+  describe("getGems", () => {
+    const GEM_FILTERS: Record<
+      keyof Required<GetGemsFilters>,
+      GetGemsFilters[keyof GetGemsFilters]
+    > = {
+      topHoldersPercentage: 10,
+      minDevLaunchedMints: 10,
+      maxDevLaunchedMints: 10,
+      numOfSocials: 10,
+      minLiquidity: 10,
+      maxLiquidity: 10,
+      minMcap: 10,
+      maxMcap: 10,
+      minVolume24h: 10,
+      maxVolume24h: 10,
+      minTxns24h: 10,
+      maxTxns24h: 10,
+      minBuys24h: 10,
+      maxBuys24h: 10,
+      minSells24h: 10,
+      maxSells24h: 10,
+      minTokenAge: 10,
+      maxTokenAge: 10,
+      minBondingCurve: 10,
+      maxBondingCurve: 10,
+      notPumpfunToken: true,
+    };
+
+    it("should return no lists when no params are provided", async () => {
+      const response = await client.getGems();
+
+      expectTypeOf(response).toEqualTypeOf<GetGemsResponse>();
+      expect(response.new).toBeUndefined();
+      expect(response.aboutToGraduate).toBeUndefined();
+      expect(response.graduated).toBeUndefined();
+    });
+
+    it("should support new filters", async () => {
+      const response = await client.getGems({
+        new: {},
+      });
+
+      expectTypeOf(response).toEqualTypeOf<GetGemsResponse>();
+      expect(response.new?.pools.length).toBeGreaterThan(0);
+    });
+
+    for (const [key, value] of Object.entries(GEM_FILTERS)) {
+      it(`should support the ${key} new filter`, async () => {
+        const response = await client.getGems({
+          new: { [key]: value },
+        });
+
+        expectTypeOf(response).toEqualTypeOf<GetGemsResponse>();
+        expect(response.new).toBeDefined();
+      });
+    }
+
+    it("should support aboutToGraduate filters", async () => {
+      const response = await client.getGems({
+        aboutToGraduate: {},
+      });
+
+      expectTypeOf(response).toEqualTypeOf<GetGemsResponse>();
+      expect(response.aboutToGraduate?.pools.length).toBeGreaterThan(0);
+    });
+
+    for (const [key, value] of Object.entries(GEM_FILTERS)) {
+      it(`should support the ${key} aboutToGraduate filter`, async () => {
+        const response = await client.getGems({
+          aboutToGraduate: { [key]: value },
+        });
+
+        expectTypeOf(response).toEqualTypeOf<GetGemsResponse>();
+        expect(response.aboutToGraduate).toBeDefined();
+      });
+    }
+
+    it("should support graduated filters", async () => {
+      const response = await client.getGems({
+        graduated: {},
+      });
+
+      expectTypeOf(response).toEqualTypeOf<GetGemsResponse>();
+      expect(response.graduated?.pools.length).toBeGreaterThan(0);
+    });
+
+    for (const [key, value] of Object.entries(GEM_FILTERS)) {
+      it(`should support the ${key} graduated filter`, async () => {
+        const response = await client.getGems({
+          graduated: { [key]: value },
+        });
+
+        expectTypeOf(response).toEqualTypeOf<GetGemsResponse>();
+        expect(response.graduated).toBeDefined();
+      });
+    }
   });
 });

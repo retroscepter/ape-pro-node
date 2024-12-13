@@ -2,6 +2,7 @@ import axios from "axios";
 import qs from "qs";
 
 import { API_URL } from "./const";
+import { type GetGemsBody, type GetGemsResponse } from "./types/gems";
 import { type LeaderboardResponse } from "./types/leaderboard";
 import { type GetPoolsParams, type GetPoolsResponse } from "./types/pools";
 import { type GetPortfolioType, type Portfolio } from "./types/portfolios";
@@ -32,6 +33,11 @@ export class RestClient {
       `/v1/ape/${address}/portfolio`,
       { params: { type } },
     );
+    return response.data;
+  }
+
+  async getGems(body?: GetGemsBody) {
+    const response = await this.#axios.post<GetGemsResponse>("/v1/gems", body);
     return response.data;
   }
 }
