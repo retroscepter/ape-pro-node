@@ -1,12 +1,12 @@
 import EventEmitter from "eventemitter3";
 import { type ErrorEvent } from "undici-types";
 
+import { type Pool } from "~/types/pools";
 import { exhaustiveGuard } from "~/utils";
 
 import { REALTIME_WS_URL } from "./const";
 import { type GraduatedAction, type SwapAction } from "./types/actions";
 import { type IncomingMessage, type OutgoingMessage } from "./types/messages";
-import { type Pool } from "./types/pools";
 
 export type RealtimeEvents = {
   disconnect: () => void;

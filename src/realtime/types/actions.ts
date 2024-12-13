@@ -1,4 +1,4 @@
-import { type Pool } from "../types/pools";
+import { type Pool } from "~/types/pools";
 
 type BaseAction = {
   type: string;

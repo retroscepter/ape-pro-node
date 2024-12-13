@@ -1,5 +1,6 @@
+import { type Pool } from "~/types/pools";
+
 import { type Action } from "./actions";
-import { type Pool } from "./pools";
 
 type BaseMessage = {
   type: string;
