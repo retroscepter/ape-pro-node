@@ -1,3 +1,4 @@
+import { type Action } from "./actions";
 import { type Pool } from "./pools";
 
 type BaseMessage = {
@@ -14,10 +15,33 @@ export type UpdatesMessage = BaseMessage & {
   data: UpdatesMessageItem[];
 };
 
-export type IncomingMessage = UpdatesMessage;
+export type ActionsMessage = BaseMessage & {
+  type: "actions";
+  data: Action[];
+};
+
+export type IncomingMessage = UpdatesMessage | ActionsMessage;
 
 export type SubscribeRecentMessage = BaseMessage & {
   type: "subscribe:recent";
 };
 
-export type OutgoingMessage = SubscribeRecentMessage;
+export type UnsubscribeRecentMessage = BaseMessage & {
+  type: "unsubscribe:recent";
+};
+
+export type SubscribePoolsMessage = BaseMessage & {
+  type: "subscribe:pool";
+  pools: string[];
+};
+
+export type UnsubscribePoolsMessage = BaseMessage & {
+  type: "unsubscribe:pool";
+  pools: string[];
+};
+
+export type OutgoingMessage =
+  | SubscribeRecentMessage
+  | UnsubscribeRecentMessage
+  | SubscribePoolsMessage
+  | UnsubscribePoolsMessage;

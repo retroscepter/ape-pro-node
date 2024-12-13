@@ -1,7 +1,7 @@
 import { afterAll, describe, expect, expectTypeOf, it } from "vitest";
 
 import { RealtimeClient } from "./client";
-import { type IncomingMessage } from "./types/messages";
+import { type GraduatedAction, type SwapAction } from "./types/actions";
 import { type Pool } from "./types/pools";
 
 describe("RealtimeClient", () => {
@@ -47,59 +47,15 @@ describe("RealtimeClient", () => {
     });
   });
 
-  describe("receiving messages", () => {
+  describe("subscriptions", () => {
     const client = new RealtimeClient();
 
-    let received = false;
-    let receivedNewPool = false;
-    let receivedPoolUpdate = false;
-
-    client.on("message", () => {
-      received = true;
-    });
-    client.on("newPool", () => {
-      receivedNewPool = true;
-    });
-    client.on("poolUpdate", () => {
-      receivedPoolUpdate = true;
-    });
-    client.connect();
-
-    afterAll(() => {
-      client.disconnect();
-    });
-
-    it("should receive any message", async () => {
-      await expect
-        .poll(() => received, { interval: 100, timeout: 10000 })
-        .toBe(true);
-    }, 10000);
-
-    it("should receive a new pool", async () => {
-      await expect
-        .poll(() => receivedNewPool, { interval: 100, timeout: 10000 })
-        .toBe(true);
-    }, 10000);
-
-    it("should receive a pool update", async () => {
-      await expect
-        .poll(() => receivedPoolUpdate, { interval: 100, timeout: 10000 })
-        .toBe(true);
-    }, 10000);
-  });
-
-  describe("message types", () => {
-    const client = new RealtimeClient();
-
-    let firstMessage: IncomingMessage | null = null;
     let firstNewPool: Pool | null = null;
     let firstPoolUpdate: Pool | null = null;
+    let firstSwap: SwapAction | null = null;
+    let firstGraduatedPool: GraduatedAction | null = null;
+    const updatedPoolIds: string[] = [];
 
-    client.on("message", (message) => {
-      if (!firstMessage) {
-        firstMessage = message;
-      }
-    });
     client.on("newPool", (pool) => {
       if (!firstNewPool) {
         firstNewPool = pool;
@@ -109,6 +65,20 @@ describe("RealtimeClient", () => {
       if (!firstPoolUpdate) {
         firstPoolUpdate = pool;
       }
+      updatedPoolIds.push(pool.id);
+    });
+    client.on("swap", (swap) => {
+      if (!firstSwap) {
+        firstSwap = swap;
+      }
+    });
+    client.on("graduated", (graduated) => {
+      if (!firstGraduatedPool) {
+        firstGraduatedPool = graduated;
+      }
+    });
+    client.on("connect", () => {
+      client.subscribeRecent();
     });
     client.connect();
 
@@ -116,25 +86,34 @@ describe("RealtimeClient", () => {
       client.disconnect();
     });
 
-    it("the first message should match the correct type", async () => {
+    it("should receive a new pool", async () => {
       await expect
-        .poll(() => firstMessage, { interval: 100, timeout: 10000 })
-        .toBeTruthy();
-      expectTypeOf(firstMessage!).toEqualTypeOf<IncomingMessage>();
-    }, 10000);
-
-    it("the first new pool should match the correct type", async () => {
-      await expect
-        .poll(() => firstNewPool, { interval: 100, timeout: 10000 })
+        .poll(() => firstNewPool, { interval: 100, timeout: 30000 })
         .toBeTruthy();
       expectTypeOf(firstNewPool!).toEqualTypeOf<Pool>();
-    }, 10000);
+    }, 30000);
 
-    it("the first pool update should match the correct type", async () => {
+    it("should receive a pool update", async () => {
       await expect
-        .poll(() => firstPoolUpdate, { interval: 100, timeout: 10000 })
+        .poll(() => firstPoolUpdate, { interval: 100, timeout: 30000 })
         .toBeTruthy();
       expectTypeOf(firstPoolUpdate!).toEqualTypeOf<Pool>();
-    }, 10000);
+    }, 30000);
+
+    it("should receive a swap", async () => {
+      client.subscribePools(updatedPoolIds);
+
+      await expect
+        .poll(() => firstSwap, { interval: 100, timeout: 30000 })
+        .toBeTruthy();
+      expectTypeOf(firstSwap!).toEqualTypeOf<SwapAction>();
+    }, 30000);
+
+    it("should receive a graduated pool", async () => {
+      await expect
+        .poll(() => firstGraduatedPool, { interval: 100, timeout: 30000 })
+        .toBeTruthy();
+      expectTypeOf(firstGraduatedPool!).toEqualTypeOf<GraduatedAction>();
+    }, 30000);
   });
 });

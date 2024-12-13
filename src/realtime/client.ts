@@ -1,7 +1,10 @@
 import EventEmitter from "eventemitter3";
 import { type ErrorEvent } from "undici-types";
 
+import { exhaustiveGuard } from "~/utils";
+
 import { REALTIME_WS_URL } from "./const";
+import { type GraduatedAction, type SwapAction } from "./types/actions";
 import { type IncomingMessage, type OutgoingMessage } from "./types/messages";
 import { type Pool } from "./types/pools";
 
@@ -12,6 +15,8 @@ export type RealtimeEvents = {
   message: (message: IncomingMessage) => void;
   newPool: (pool: Pool) => void;
   poolUpdate: (pool: Pool) => void;
+  swap: (swap: SwapAction) => void;
+  graduated: (graduated: GraduatedAction) => void;
 };
 
 export class RealtimeClient extends EventEmitter<RealtimeEvents> {
@@ -41,6 +46,22 @@ export class RealtimeClient extends EventEmitter<RealtimeEvents> {
     this.#ws.send(JSON.stringify(message));
   }
 
+  subscribeRecent() {
+    this.send({ type: "subscribe:recent" });
+  }
+
+  unsubscribeRecent() {
+    this.send({ type: "unsubscribe:recent" });
+  }
+
+  subscribePools(pools: string[]) {
+    this.send({ type: "subscribe:pool", pools });
+  }
+
+  unsubscribePools(pools: string[]) {
+    this.send({ type: "unsubscribe:pool", pools });
+  }
+
   disconnect() {
     if (!this.#ws) {
       throw new Error("Not connected");
@@ -58,7 +79,6 @@ export class RealtimeClient extends EventEmitter<RealtimeEvents> {
   }
 
   #handleOpen = () => {
-    this.send({ type: "subscribe:recent" });
     this.emit("connect");
   };
 
@@ -90,18 +110,43 @@ export class RealtimeClient extends EventEmitter<RealtimeEvents> {
       this.listeners("newPool").length > 0 ||
       this.listeners("poolUpdate").length > 0
     ) {
-      switch (data.type) {
-        case "updates":
-          for (const item of data.data) {
-            this.emit(
-              item.type === "new" ? "newPool" : "poolUpdate",
-              item.pool,
-            );
+      if (data.type === "updates") {
+        for (const item of data.data) {
+          const type = item.type;
+          switch (type) {
+            case "new":
+              this.emit("newPool", item.pool);
+              break;
+            case "update":
+              this.emit("poolUpdate", item.pool);
+              break;
+            default:
+              exhaustiveGuard(type);
+              break;
           }
-          break;
-        default:
-          this.emit("error", new Error("Unknown message type"));
-          break;
+        }
+      }
+    }
+
+    if (
+      this.listeners("swap").length > 0 ||
+      this.listeners("graduated").length > 0
+    ) {
+      if (data.type === "actions") {
+        for (const action of data.data) {
+          const type = action.type;
+          switch (type) {
+            case "swap":
+              this.emit("swap", action);
+              break;
+            case "graduated":
+              this.emit("graduated", action);
+              break;
+            default:
+              exhaustiveGuard(type);
+              break;
+          }
+        }
       }
     }
   };
