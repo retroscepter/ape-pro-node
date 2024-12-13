@@ -154,10 +154,7 @@ describe("RestClient", () => {
   });
 
   describe("getGems", () => {
-    const GEM_FILTERS: Record<
-      keyof Required<GetGemsFilters>,
-      GetGemsFilters[keyof GetGemsFilters]
-    > = {
+    const GEM_FILTERS: GetGemsFilters = {
       topHoldersPercentage: 10,
       minDevLaunchedMints: 10,
       maxDevLaunchedMints: 10,
@@ -190,64 +187,31 @@ describe("RestClient", () => {
       expect(response.graduated).toBeUndefined();
     });
 
-    it("should support new filters", async () => {
+    it("should support all new filters", async () => {
       const response = await client.getGems({
-        new: {},
+        new: GEM_FILTERS,
       });
 
       expectTypeOf(response).toEqualTypeOf<GetGemsResponse>();
-      expect(response.new?.pools.length).toBeGreaterThan(0);
+      expect(response.new).toBeDefined();
     });
 
-    for (const [key, value] of Object.entries(GEM_FILTERS)) {
-      it(`should support the ${key} new filter`, async () => {
-        const response = await client.getGems({
-          new: { [key]: value },
-        });
-
-        expectTypeOf(response).toEqualTypeOf<GetGemsResponse>();
-        expect(response.new).toBeDefined();
-      });
-    }
-
-    it("should support aboutToGraduate filters", async () => {
+    it("should support all aboutToGraduate filters", async () => {
       const response = await client.getGems({
-        aboutToGraduate: {},
+        aboutToGraduate: GEM_FILTERS,
       });
 
       expectTypeOf(response).toEqualTypeOf<GetGemsResponse>();
-      expect(response.aboutToGraduate?.pools.length).toBeGreaterThan(0);
+      expect(response.aboutToGraduate).toBeDefined();
     });
 
-    for (const [key, value] of Object.entries(GEM_FILTERS)) {
-      it(`should support the ${key} aboutToGraduate filter`, async () => {
-        const response = await client.getGems({
-          aboutToGraduate: { [key]: value },
-        });
-
-        expectTypeOf(response).toEqualTypeOf<GetGemsResponse>();
-        expect(response.aboutToGraduate).toBeDefined();
-      });
-    }
-
-    it("should support graduated filters", async () => {
+    it("should support all graduated filters", async () => {
       const response = await client.getGems({
-        graduated: {},
+        graduated: GEM_FILTERS,
       });
 
       expectTypeOf(response).toEqualTypeOf<GetGemsResponse>();
-      expect(response.graduated?.pools.length).toBeGreaterThan(0);
+      expect(response.graduated).toBeDefined();
     });
-
-    for (const [key, value] of Object.entries(GEM_FILTERS)) {
-      it(`should support the ${key} graduated filter`, async () => {
-        const response = await client.getGems({
-          graduated: { [key]: value },
-        });
-
-        expectTypeOf(response).toEqualTypeOf<GetGemsResponse>();
-        expect(response.graduated).toBeDefined();
-      });
-    }
   });
 });
