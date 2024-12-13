@@ -2,7 +2,9 @@ import * as dateFns from "date-fns";
 import { describe, expect, expectTypeOf, it } from "vitest";
 
 import { RestClient } from "./client";
+import { type LeaderboardResponse } from "./types/leaderboard";
 import { type GetPoolsResponse, type PoolSortBy } from "./types/pools";
+import { type Portfolio } from "./types/portfolios";
 
 const SOL_ASSET_ID = "So11111111111111111111111111111111111111112";
 const JUP_ASSET_ID = "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN";
@@ -26,9 +28,9 @@ const SORT_DIR_OPTIONS = ["asc", "desc"] as const;
 const oneDayAgo = dateFns.subDays(new Date(), 1);
 
 describe("RestClient", () => {
-  describe("getPools", () => {
-    const client = new RestClient();
+  const client = new RestClient();
 
+  describe("getPools", () => {
     it("should return no pools when no params are provided", async () => {
       const response = await client.getPools();
 
@@ -118,6 +120,36 @@ describe("RestClient", () => {
 
       expectTypeOf(response).toEqualTypeOf<GetPoolsResponse>();
       expect(response.pools.length).toBe(10);
+    });
+  });
+
+  let portfolioAddress: string | null = null;
+
+  describe("getLeaderboard", () => {
+    it("should return the leaderboard", async () => {
+      const response = await client.getLeaderboard();
+
+      expectTypeOf(response).toEqualTypeOf<LeaderboardResponse>();
+      expect(response.rankings.length).toBeGreaterThan(0);
+
+      portfolioAddress = response.rankings[0].vault;
+    });
+  });
+
+  describe("getPortfolio", () => {
+    it("should return the open portfolio", async () => {
+      const response = await client.getPortfolio(portfolioAddress!, "open");
+
+      expectTypeOf(response).toEqualTypeOf<Portfolio>();
+    });
+
+    it("should return the profitable portfolio", async () => {
+      const response = await client.getPortfolio(
+        portfolioAddress!,
+        "profitable",
+      );
+
+      expectTypeOf(response).toEqualTypeOf<Portfolio>();
     });
   });
 });
