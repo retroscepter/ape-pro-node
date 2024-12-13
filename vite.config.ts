@@ -5,5 +5,10 @@ export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
     passWithNoTests: true,
+    typecheck: {
+      enabled: true,
+    },
+    reporters: ["json", "default"],
+    outputFile: "test-results.json",
   },
 });
