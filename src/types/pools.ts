@@ -16,7 +16,7 @@ export type PoolBaseAsset = {
   mcap?: number;
   launchpad?: string;
   tokenProgram: string;
-  devMintCount: number;
+  devMintCount?: number;
 };
 
 export type PoolQuoteAsset = {
