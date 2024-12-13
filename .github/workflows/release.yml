@@ -15,7 +15,7 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - name: Checkout Repo
+      - name: Checkout repo
         uses: actions/checkout@v3
 
       - name: Setup Node.js 22.11.0
@@ -26,13 +26,13 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: pnpm install
 
-      - name: Run Tests
-        run: pnpm test
+      - name: Run unit tests
+        run: pnpm test unit
 
-      - name: Create Release Pull Request or Publish to npm
+      - name: Create release PR or publish to NPM
         id: changesets
         uses: changesets/action@v1
         with:

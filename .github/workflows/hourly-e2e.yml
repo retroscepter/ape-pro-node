@@ -1,0 +1,30 @@
+name: Hourly E2E tests
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  e2e-tests:
+    name: E2E tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js 22.11.0
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.11.0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run E2E tests
+        run: pnpm test e2e
