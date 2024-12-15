@@ -1,11 +1,11 @@
 import * as dateFns from "date-fns";
 import { describe, expect, it } from "vitest";
 
-import { RestClient } from "./client";
-import { type GetGemsFilters, getGemsResponseSchema } from "./types/gems";
-import { getLeaderboardResponseSchema } from "./types/leaderboard";
-import { getPoolsResponseSchema, type PoolSortBy } from "./types/pools";
-import { portfolioSchema } from "./types/portfolios";
+import { ApeRestClient } from "./client";
+import { type GetApeGemsFilters, getApeGemsResponseSchema } from "./types/gems";
+import { getApeLeaderboardResponseSchema } from "./types/leaderboard";
+import { type ApePoolSortBy, getApePoolsResponseSchema } from "./types/pools";
+import { apePortfolioSchema } from "./types/portfolios";
 
 const SOL_ASSET_ID = "So11111111111111111111111111111111111111112";
 const JUP_ASSET_ID = "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN";
@@ -13,10 +13,10 @@ const JUP_ASSET_ID = "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN";
 const oneDayAgo = dateFns.subDays(new Date(), 1);
 
 describe("RestClient", () => {
-  const client = new RestClient();
+  const client = new ApeRestClient();
 
   describe("getPools", () => {
-    const SORT_BY_OPTIONS: PoolSortBy[] = [
+    const SORT_BY_OPTIONS: ApePoolSortBy[] = [
       "listedTime",
       "mcap",
       "volume5m",
@@ -34,7 +34,7 @@ describe("RestClient", () => {
     it("should return no pools when no params are provided", async () => {
       const response = await client.getPools();
 
-      expect(() => getPoolsResponseSchema.parse(response)).not.toThrow();
+      expect(() => getApePoolsResponseSchema.parse(response)).not.toThrow();
       expect(response.pools.length).toBe(0);
     });
 
@@ -43,7 +43,7 @@ describe("RestClient", () => {
         assetIds: ["invalid-asset-id"],
       });
 
-      expect(() => getPoolsResponseSchema.parse(response)).not.toThrow();
+      expect(() => getApePoolsResponseSchema.parse(response)).not.toThrow();
       expect(response.pools.length).toBe(0);
     });
 
@@ -52,7 +52,7 @@ describe("RestClient", () => {
         assetIds: [SOL_ASSET_ID, JUP_ASSET_ID],
       });
 
-      expect(() => getPoolsResponseSchema.parse(response)).not.toThrow();
+      expect(() => getApePoolsResponseSchema.parse(response)).not.toThrow();
       expect(response.pools.length).toBe(2);
     });
 
@@ -61,7 +61,7 @@ describe("RestClient", () => {
         createdAt: oneDayAgo,
       });
 
-      expect(() => getPoolsResponseSchema.parse(response)).not.toThrow();
+      expect(() => getApePoolsResponseSchema.parse(response)).not.toThrow();
       expect(response.pools.length).toBe(0);
     });
 
@@ -75,7 +75,7 @@ describe("RestClient", () => {
           offset: 0,
         });
 
-        expect(() => getPoolsResponseSchema.parse(response)).not.toThrow();
+        expect(() => getApePoolsResponseSchema.parse(response)).not.toThrow();
         expect(response.pools.length).toBeGreaterThan(0);
       });
     }
@@ -90,7 +90,7 @@ describe("RestClient", () => {
           offset: 0,
         });
 
-        expect(() => getPoolsResponseSchema.parse(response)).not.toThrow();
+        expect(() => getApePoolsResponseSchema.parse(response)).not.toThrow();
         expect(response.pools.length).toBeGreaterThan(0);
       });
     }
@@ -104,7 +104,7 @@ describe("RestClient", () => {
         offset: 10,
       });
 
-      expect(() => getPoolsResponseSchema.parse(response)).not.toThrow();
+      expect(() => getApePoolsResponseSchema.parse(response)).not.toThrow();
       expect(response.pools.length).toBe(10);
     });
 
@@ -118,7 +118,7 @@ describe("RestClient", () => {
         notPumpfunToken: true,
       });
 
-      expect(() => getPoolsResponseSchema.parse(response)).not.toThrow();
+      expect(() => getApePoolsResponseSchema.parse(response)).not.toThrow();
       expect(response.pools.length).toBe(10);
     });
   });
@@ -129,7 +129,9 @@ describe("RestClient", () => {
     it("should return the leaderboard", async () => {
       const response = await client.getLeaderboard();
 
-      expect(() => getLeaderboardResponseSchema.parse(response)).not.toThrow();
+      expect(() =>
+        getApeLeaderboardResponseSchema.parse(response),
+      ).not.toThrow();
       expect(response.rankings.length).toBeGreaterThan(0);
 
       portfolioAddress = response.rankings[0].vault;
@@ -140,7 +142,7 @@ describe("RestClient", () => {
     it("should return the open portfolio", async () => {
       const response = await client.getPortfolio(portfolioAddress!, "open");
 
-      expect(() => portfolioSchema.parse(response)).not.toThrow();
+      expect(() => apePortfolioSchema.parse(response)).not.toThrow();
     });
 
     it("should return the profitable portfolio", async () => {
@@ -149,12 +151,12 @@ describe("RestClient", () => {
         "profitable",
       );
 
-      expect(() => portfolioSchema.parse(response)).not.toThrow();
+      expect(() => apePortfolioSchema.parse(response)).not.toThrow();
     });
   });
 
   describe("getGems", () => {
-    const GEM_FILTERS: GetGemsFilters = {
+    const GEM_FILTERS: GetApeGemsFilters = {
       topHoldersPercentage: 10,
       minDevLaunchedMints: 10,
       maxDevLaunchedMints: 10,
@@ -181,7 +183,7 @@ describe("RestClient", () => {
     it("should return no lists when no params are provided", async () => {
       const response = await client.getGems();
 
-      expect(() => getGemsResponseSchema.parse(response)).not.toThrow();
+      expect(() => getApeGemsResponseSchema.parse(response)).not.toThrow();
       expect(response.new).toBeUndefined();
       expect(response.aboutToGraduate).toBeUndefined();
       expect(response.graduated).toBeUndefined();
@@ -192,7 +194,7 @@ describe("RestClient", () => {
         new: GEM_FILTERS,
       });
 
-      expect(() => getGemsResponseSchema.parse(response)).not.toThrow();
+      expect(() => getApeGemsResponseSchema.parse(response)).not.toThrow();
       expect(response.new).toBeDefined();
     });
 
@@ -201,7 +203,7 @@ describe("RestClient", () => {
         aboutToGraduate: GEM_FILTERS,
       });
 
-      expect(() => getGemsResponseSchema.parse(response)).not.toThrow();
+      expect(() => getApeGemsResponseSchema.parse(response)).not.toThrow();
       expect(response.aboutToGraduate).toBeDefined();
     });
 
@@ -210,7 +212,7 @@ describe("RestClient", () => {
         graduated: GEM_FILTERS,
       });
 
-      expect(() => getGemsResponseSchema.parse(response)).not.toThrow();
+      expect(() => getApeGemsResponseSchema.parse(response)).not.toThrow();
       expect(response.graduated).toBeDefined();
     });
   });

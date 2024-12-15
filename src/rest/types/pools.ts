@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { poolSchema } from "~/types/pools";
+import { apePoolSchema } from "~/types/pools";
 
-export const poolSortBySchema = z.enum([
+export const apePoolSortBySchema = z.enum([
   "listedTime",
   "mcap",
   "volume5m",
@@ -15,23 +15,23 @@ export const poolSortBySchema = z.enum([
   "txs24h",
   "liquidity",
 ]);
-export type PoolSortBy = z.infer<typeof poolSortBySchema>;
+export type ApePoolSortBy = z.infer<typeof apePoolSortBySchema>;
 
-export const getPoolsParamsSchema = z.object({
+export const getApePoolsParamsSchema = z.object({
   createdAt: z.date().optional(),
-  sortBy: poolSortBySchema.optional(),
+  sortBy: apePoolSortBySchema.optional(),
   sortDir: z.enum(["asc", "desc"]).optional(),
   limit: z.number().optional(),
   offset: z.number().optional(),
   notPumpfunToken: z.literal(true).optional(),
   assetIds: z.array(z.string()).optional(),
 });
-export type GetPoolsParams = z.infer<typeof getPoolsParamsSchema>;
+export type GetApePoolsParams = z.infer<typeof getApePoolsParamsSchema>;
 
-export const getPoolsResponseSchema = z.object({
-  pools: z.array(poolSchema),
+export const getApePoolsResponseSchema = z.object({
+  pools: z.array(apePoolSchema),
   next: z.number().optional(),
   total: z.number(),
 });
 
-export type GetPoolsResponse = z.infer<typeof getPoolsResponseSchema>;
+export type GetApePoolsResponse = z.infer<typeof getApePoolsResponseSchema>;

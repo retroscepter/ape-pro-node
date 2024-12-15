@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { getPoolsResponseSchema } from "./pools";
+import { getApePoolsResponseSchema } from "./pools";
 
-export const getGemsFiltersSchema = z.object({
+export const getApeGemsFiltersSchema = z.object({
   topHoldersPercentage: z.optional(z.number()),
   minDevLaunchedMints: z.optional(z.number()),
   maxDevLaunchedMints: z.optional(z.number()),
@@ -25,18 +25,18 @@ export const getGemsFiltersSchema = z.object({
   maxBondingCurve: z.optional(z.number()),
   notPumpfunToken: z.optional(z.boolean()),
 });
-export type GetGemsFilters = z.infer<typeof getGemsFiltersSchema>;
+export type GetApeGemsFilters = z.infer<typeof getApeGemsFiltersSchema>;
 
-export const getGemsBodySchema = z.object({
-  new: z.optional(getGemsFiltersSchema),
-  aboutToGraduate: z.optional(getGemsFiltersSchema),
-  graduated: z.optional(getGemsFiltersSchema),
+export const getApeGemsBodySchema = z.object({
+  new: z.optional(getApeGemsFiltersSchema),
+  aboutToGraduate: z.optional(getApeGemsFiltersSchema),
+  graduated: z.optional(getApeGemsFiltersSchema),
 });
-export type GetGemsBody = z.infer<typeof getGemsBodySchema>;
+export type GetApeGemsBody = z.infer<typeof getApeGemsBodySchema>;
 
-export const getGemsResponseSchema = z.object({
-  new: z.optional(getPoolsResponseSchema),
-  aboutToGraduate: z.optional(getPoolsResponseSchema),
-  graduated: z.optional(getPoolsResponseSchema),
+export const getApeGemsResponseSchema = z.object({
+  new: z.optional(getApePoolsResponseSchema),
+  aboutToGraduate: z.optional(getApePoolsResponseSchema),
+  graduated: z.optional(getApePoolsResponseSchema),
 });
-export type GetGemsResponse = z.infer<typeof getGemsResponseSchema>;
+export type GetApeGemsResponse = z.infer<typeof getApeGemsResponseSchema>;

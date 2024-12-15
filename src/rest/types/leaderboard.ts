@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const leaderboardRankingSchema = z.object({
+export const apeLeaderboardRankingSchema = z.object({
   vault: z.string(),
   netWorth: z.number(),
   netWorthInSol: z.number(),
@@ -10,11 +10,11 @@ export const leaderboardRankingSchema = z.object({
   volumeInSol: z.number(),
   lastUpdated: z.string(),
 });
-export type LeaderboardRanking = z.infer<typeof leaderboardRankingSchema>;
+export type ApeLeaderboardRanking = z.infer<typeof apeLeaderboardRankingSchema>;
 
-export const getLeaderboardResponseSchema = z.object({
-  rankings: z.array(leaderboardRankingSchema),
+export const getApeLeaderboardResponseSchema = z.object({
+  rankings: z.array(apeLeaderboardRankingSchema),
 });
-export type GetLeaderboardResponse = z.infer<
-  typeof getLeaderboardResponseSchema
+export type GetApeLeaderboardResponse = z.infer<
+  typeof getApeLeaderboardResponseSchema
 >;

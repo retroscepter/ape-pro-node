@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { poolSchema } from "~/types/pools";
+import { apePoolSchema } from "~/types/pools";
 
-export const swapActionSchema = z.object({
+export const apeSwapActionSchema = z.object({
   type: z.literal("swap"),
   blockId: z.number(),
   txHash: z.string(),
@@ -17,16 +17,16 @@ export const swapActionSchema = z.object({
   returnAssetUsdPrice: z.number(),
   usdVolume: z.number(),
 });
-export type SwapAction = z.infer<typeof swapActionSchema>;
+export type ApeSwapAction = z.infer<typeof apeSwapActionSchema>;
 
-export const graduatedActionSchema = z.object({
+export const apeGraduatedActionSchema = z.object({
   type: z.literal("graduated"),
-  pool: poolSchema,
+  pool: apePoolSchema,
 });
-export type GraduatedAction = z.infer<typeof graduatedActionSchema>;
+export type ApeGraduatedAction = z.infer<typeof apeGraduatedActionSchema>;
 
-export const actionSchema = z.discriminatedUnion("type", [
-  swapActionSchema,
-  graduatedActionSchema,
+export const apeActionSchema = z.discriminatedUnion("type", [
+  apeSwapActionSchema,
+  apeGraduatedActionSchema,
 ]);
-export type Action = z.infer<typeof actionSchema>;
+export type ApeAction = z.infer<typeof apeActionSchema>;

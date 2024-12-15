@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const poolBaseAssetSchema = z.object({
+export const apeAssetSchema = z.object({
   id: z.string(),
   name: z.string(),
   symbol: z.string(),
@@ -20,25 +20,25 @@ export const poolBaseAssetSchema = z.object({
   tokenProgram: z.string(),
   devMintCount: z.optional(z.number()),
 });
-export type PoolBaseAsset = z.infer<typeof poolBaseAssetSchema>;
+export type ApeAsset = z.infer<typeof apeAssetSchema>;
 
-export const poolQuoteAssetSchema = z.object({
-  id: z.string(),
-  symbol: z.string(),
-  decimals: z.number(),
-  poolAmount: z.number().optional(),
+export const apePartialAssetSchema = apeAssetSchema.pick({
+  id: true,
+  symbol: true,
+  decimals: true,
+  poolAmount: true,
 });
-export type PoolQuoteAsset = z.infer<typeof poolQuoteAssetSchema>;
+export type ApePartialAsset = z.infer<typeof apePartialAssetSchema>;
 
-export const poolAuditSchema = z.object({
+export const apePoolAuditSchema = z.object({
   mintAuthorityDisabled: z.optional(z.boolean()),
   freezeAuthorityDisabled: z.optional(z.boolean()),
   topHoldersPercentage: z.optional(z.number()),
   lpBurnedPercentage: z.optional(z.number()),
 });
-export type PoolAudit = z.infer<typeof poolAuditSchema>;
+export type ApePoolAudit = z.infer<typeof apePoolAuditSchema>;
 
-export const poolStatsSchema = z.object({
+export const apePoolStatsSchema = z.object({
   priceChange: z.optional(z.number()),
   buyVolume: z.optional(z.number()),
   sellVolume: z.optional(z.number()),
@@ -48,24 +48,24 @@ export const poolStatsSchema = z.object({
   numBuyers: z.optional(z.number()),
   numSellers: z.optional(z.number()),
 });
-export type PoolStats = z.infer<typeof poolStatsSchema>;
+export type ApePoolStats = z.infer<typeof apePoolStatsSchema>;
 
-export const poolSchema = z.object({
+export const apePoolSchema = z.object({
   id: z.string(),
   chain: z.string(),
   dex: z.string(),
   type: z.string(),
-  baseAsset: poolBaseAssetSchema,
-  quoteAsset: poolQuoteAssetSchema,
-  audit: poolAuditSchema,
+  baseAsset: apeAssetSchema,
+  quoteAsset: apePartialAssetSchema,
+  audit: apePoolAuditSchema,
   createdAt: z.string(),
   liquidity: z.number().optional(),
-  stats5m: z.optional(poolStatsSchema),
-  stats1h: z.optional(poolStatsSchema),
-  stats6h: z.optional(poolStatsSchema),
-  stats24h: z.optional(poolStatsSchema),
+  stats5m: z.optional(apePoolStatsSchema),
+  stats1h: z.optional(apePoolStatsSchema),
+  stats6h: z.optional(apePoolStatsSchema),
+  stats24h: z.optional(apePoolStatsSchema),
   bondingCurve: z.optional(z.number()),
   isUnreliable: z.optional(z.boolean()),
   updatedAt: z.string(),
 });
-export type Pool = z.infer<typeof poolSchema>;
+export type ApePool = z.infer<typeof apePoolSchema>;
