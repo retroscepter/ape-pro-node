@@ -1,22 +1,32 @@
 import EventEmitter from "eventemitter3";
 import {
   type ClientOptions,
+  type CloseEvent,
   type ErrorEvent,
   type MessageEvent,
   WebSocket,
 } from "ws";
+import { z } from "zod";
 
 import { APE_REALTIME_WS_URL } from "./const";
 import { type ApeAction } from "./types/actions";
 import { type ApeEvent, type ApeUpdate } from "./types/events";
 import { type ApeMessage } from "./types/messages";
 
-export type ApeRealtimeClientOptions = {
-  ws?: ClientOptions;
-};
+export const apeRealtimeClientOptionsSchema = z.object({
+  ws: z.custom<ClientOptions>().optional(),
+  reconnect: z.boolean().default(true),
+  reconnectInterval: z.number().default(1000),
+});
+export type ApeRealtimeClientOptions = z.input<
+  typeof apeRealtimeClientOptionsSchema
+>;
+type ApeRealtimeClientParsedOptions = z.output<
+  typeof apeRealtimeClientOptionsSchema
+>;
 
 export type ApeRealtimeClientEvents = {
-  disconnect: () => void;
+  disconnect: (event?: CloseEvent) => void;
   connect: () => void;
   error: (error: Error) => void;
   event: (message: ApeEvent) => void;
@@ -25,17 +35,17 @@ export type ApeRealtimeClientEvents = {
 };
 
 export class ApeRealtimeClient extends EventEmitter<ApeRealtimeClientEvents> {
-  #options: ApeRealtimeClientOptions;
+  #options: ApeRealtimeClientParsedOptions;
   #ws: WebSocket | null = null;
 
   constructor(options?: ApeRealtimeClientOptions) {
     super();
-    this.#options = options ?? {};
+    this.#options = apeRealtimeClientOptionsSchema.parse(options ?? {});
   }
 
   connect() {
     if (this.#ws) {
-      throw new Error("Already initialized");
+      throw new Error("connect: websocket already intialized");
     }
 
     this.#ws = new WebSocket(APE_REALTIME_WS_URL, this.#options.ws);
@@ -47,7 +57,9 @@ export class ApeRealtimeClient extends EventEmitter<ApeRealtimeClientEvents> {
 
   send(message: ApeMessage) {
     if (!this.#ws) {
-      throw new Error("Not connected");
+      throw new Error(
+        "send: websocket not initialized, please connect before trying to send a message",
+      );
     }
 
     this.#ws.send(JSON.stringify(message));
@@ -71,26 +83,40 @@ export class ApeRealtimeClient extends EventEmitter<ApeRealtimeClientEvents> {
 
   disconnect() {
     if (!this.#ws) {
-      throw new Error("Not connected");
+      throw new Error(
+        "disconnect: websocket not initialized, please connect before trying to disconnect",
+      );
+    }
+
+    this.#removeListeners();
+    this.#ws.close();
+    this.#ws = null;
+    this.emit("disconnect");
+  }
+
+  #removeListeners() {
+    if (!this.#ws) {
+      throw new Error("disconnect: websocket not initialized");
     }
 
     this.#ws.removeEventListener("message", this.#handleMessage);
     this.#ws.removeEventListener("error", this.#handleError);
     this.#ws.removeEventListener("close", this.#handleClose);
     this.#ws.removeEventListener("open", this.#handleOpen);
-
-    this.#ws.close();
-    this.#ws = null;
-
-    this.emit("disconnect");
   }
 
   #handleOpen = () => {
     this.emit("connect");
   };
 
-  #handleClose = () => {
-    this.emit("disconnect");
+  #handleClose = (event: CloseEvent) => {
+    this.#removeListeners();
+    this.#ws = null;
+    this.emit("disconnect", event);
+
+    if (this.#options.reconnect) {
+      setTimeout(() => this.connect(), this.#options.reconnectInterval);
+    }
   };
 
   #handleError = (event: ErrorEvent) => {

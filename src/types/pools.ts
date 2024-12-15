@@ -9,7 +9,7 @@ export const apeAssetSchema = z.object({
   twitter: z.optional(z.string()),
   website: z.optional(z.string()),
   dev: z.string().optional(),
-  usdPrice: z.number(),
+  usdPrice: z.number().optional(),
   nativePrice: z.number().optional(),
   poolAmount: z.number().optional(),
   circSupply: z.number(),
