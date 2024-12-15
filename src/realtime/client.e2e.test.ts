@@ -4,7 +4,7 @@ import { ApeRealtimeClient } from "./client";
 import { type ApeAction, apeActionSchema } from "./types/actions";
 import {
   type ApeEvent,
-  ApeEventSchema,
+  apeEventSchema,
   type ApeUpdate,
   apeUpdateSchema,
 } from "./types/events";
@@ -93,7 +93,7 @@ describe("RealtimeClient", () => {
       await expect
         .poll(() => firstEvent, { interval: 100, timeout: 30000 })
         .toBeTruthy();
-      expect(() => ApeEventSchema.parse(firstEvent)).not.toThrow();
+      expect(() => apeEventSchema.parse(firstEvent)).not.toThrow();
     }, 30000);
 
     it("should receive a valid updates event", async () => {

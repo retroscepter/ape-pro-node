@@ -22,8 +22,8 @@ export const apeActionsEventSchema = z.object({
 });
 export type ApeActionsEvent = z.infer<typeof apeActionsEventSchema>;
 
-export const ApeEventSchema = z.discriminatedUnion("type", [
+export const apeEventSchema = z.discriminatedUnion("type", [
   apeUpdatesEventSchema,
   apeActionsEventSchema,
 ]);
-export type ApeEvent = z.infer<typeof ApeEventSchema>;
+export type ApeEvent = z.infer<typeof apeEventSchema>;
