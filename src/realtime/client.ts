@@ -1,10 +1,19 @@
 import EventEmitter from "eventemitter3";
-import { type ErrorEvent } from "undici-types";
+import {
+  type ClientOptions,
+  type ErrorEvent,
+  type MessageEvent,
+  WebSocket,
+} from "ws";
 
 import { APE_REALTIME_WS_URL } from "./const";
 import { type ApeAction } from "./types/actions";
 import { type ApeEvent, type ApeUpdate } from "./types/events";
 import { type ApeMessage } from "./types/messages";
+
+export type ApeRealtimeClientOptions = {
+  ws?: ClientOptions;
+};
 
 export type ApeRealtimeClientEvents = {
   disconnect: () => void;
@@ -16,10 +25,12 @@ export type ApeRealtimeClientEvents = {
 };
 
 export class ApeRealtimeClient extends EventEmitter<ApeRealtimeClientEvents> {
+  #options: ApeRealtimeClientOptions;
   #ws: WebSocket | null = null;
 
-  constructor() {
+  constructor(options?: ApeRealtimeClientOptions) {
     super();
+    this.#options = options ?? {};
   }
 
   connect() {
@@ -27,7 +38,7 @@ export class ApeRealtimeClient extends EventEmitter<ApeRealtimeClientEvents> {
       throw new Error("Already initialized");
     }
 
-    this.#ws = new WebSocket(APE_REALTIME_WS_URL);
+    this.#ws = new WebSocket(APE_REALTIME_WS_URL, this.#options.ws);
     this.#ws.addEventListener("message", this.#handleMessage);
     this.#ws.addEventListener("error", this.#handleError);
     this.#ws.addEventListener("close", this.#handleClose);
@@ -42,19 +53,19 @@ export class ApeRealtimeClient extends EventEmitter<ApeRealtimeClientEvents> {
     this.#ws.send(JSON.stringify(message));
   }
 
-  subscribeRecent() {
+  subscribeToRecent() {
     this.send({ type: "subscribe:recent" });
   }
 
-  unsubscribeRecent() {
+  unsubscribeFromRecent() {
     this.send({ type: "unsubscribe:recent" });
   }
 
-  subscribePools(pools: string[]) {
+  subscribeToPools(pools: string[]) {
     this.send({ type: "subscribe:pool", pools });
   }
 
-  unsubscribePools(pools: string[]) {
+  unsubscribeFromPools(pools: string[]) {
     this.send({ type: "unsubscribe:pool", pools });
   }
 
@@ -83,7 +94,7 @@ export class ApeRealtimeClient extends EventEmitter<ApeRealtimeClientEvents> {
   };
 
   #handleError = (event: ErrorEvent) => {
-    this.emit("error", new Error(event.message));
+    this.emit("error", new Error(event.message, { cause: event }));
   };
 
   #handleMessage = (event: MessageEvent) => {

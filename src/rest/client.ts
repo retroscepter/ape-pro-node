@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { type AxiosInstance, type CreateAxiosDefaults } from "axios";
 import qs from "qs";
 
 import { APE_API_URL } from "./const";
@@ -13,12 +13,21 @@ import {
   type GetApePortfolioType,
 } from "./types/portfolios";
 
+export type ApeRestClientOptions = {
+  axios?: CreateAxiosDefaults;
+};
+
 export class ApeRestClient {
-  #axios = axios.create({
-    baseURL: APE_API_URL,
-    paramsSerializer: (params) =>
-      qs.stringify(params, { arrayFormat: "comma" }),
-  });
+  #axios: AxiosInstance;
+
+  constructor(options?: ApeRestClientOptions) {
+    this.#axios = axios.create({
+      baseURL: APE_API_URL,
+      paramsSerializer: (params) =>
+        qs.stringify(params, { arrayFormat: "comma" }),
+      ...options?.axios,
+    });
+  }
 
   async getPools(params?: GetApePoolsParams) {
     const response = await this.#axios.get<GetApePoolsResponse>("/v1/pools", {

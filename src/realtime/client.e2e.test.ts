@@ -69,7 +69,7 @@ describe("RealtimeClient", () => {
     client.on("updates", (updates) => {
       if (firstUpdates.length === 0) {
         firstUpdates.push(...updates);
-        client.subscribePools(firstUpdates.map((u) => u.pool.id));
+        client.subscribeToPools(firstUpdates.map((u) => u.pool.id));
       }
     });
 
@@ -80,7 +80,7 @@ describe("RealtimeClient", () => {
     });
 
     client.on("connect", () => {
-      client.subscribeRecent();
+      client.subscribeToRecent();
     });
 
     client.connect();
