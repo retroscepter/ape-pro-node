@@ -1,5 +1,11 @@
 # ape.pro
 
+## 0.0.5
+
+### Patch Changes
+
+- 7907d70: Update types
+
 ## 0.0.4
 
 ### Patch Changes
