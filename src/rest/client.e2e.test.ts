@@ -1,11 +1,11 @@
 import * as dateFns from "date-fns";
-import { describe, expect, expectTypeOf, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { RestClient } from "./client";
-import { type GetGemsFilters, type GetGemsResponse } from "./types/gems";
-import { type LeaderboardResponse } from "./types/leaderboard";
-import { type GetPoolsResponse, type PoolSortBy } from "./types/pools";
-import { type Portfolio } from "./types/portfolios";
+import { type GetGemsFilters, getGemsResponseSchema } from "./types/gems";
+import { getLeaderboardResponseSchema } from "./types/leaderboard";
+import { getPoolsResponseSchema, type PoolSortBy } from "./types/pools";
+import { portfolioSchema } from "./types/portfolios";
 
 const SOL_ASSET_ID = "So11111111111111111111111111111111111111112";
 const JUP_ASSET_ID = "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN";
@@ -34,7 +34,7 @@ describe("RestClient", () => {
     it("should return no pools when no params are provided", async () => {
       const response = await client.getPools();
 
-      expectTypeOf(response).toEqualTypeOf<GetPoolsResponse>();
+      expect(() => getPoolsResponseSchema.parse(response)).not.toThrow();
       expect(response.pools.length).toBe(0);
     });
 
@@ -43,7 +43,7 @@ describe("RestClient", () => {
         assetIds: ["invalid-asset-id"],
       });
 
-      expectTypeOf(response).toEqualTypeOf<GetPoolsResponse>();
+      expect(() => getPoolsResponseSchema.parse(response)).not.toThrow();
       expect(response.pools.length).toBe(0);
     });
 
@@ -52,7 +52,7 @@ describe("RestClient", () => {
         assetIds: [SOL_ASSET_ID, JUP_ASSET_ID],
       });
 
-      expectTypeOf(response).toEqualTypeOf<GetPoolsResponse>();
+      expect(() => getPoolsResponseSchema.parse(response)).not.toThrow();
       expect(response.pools.length).toBe(2);
     });
 
@@ -61,7 +61,7 @@ describe("RestClient", () => {
         createdAt: oneDayAgo,
       });
 
-      expectTypeOf(response).toEqualTypeOf<GetPoolsResponse>();
+      expect(() => getPoolsResponseSchema.parse(response)).not.toThrow();
       expect(response.pools.length).toBe(0);
     });
 
@@ -75,7 +75,7 @@ describe("RestClient", () => {
           offset: 0,
         });
 
-        expectTypeOf(response).toEqualTypeOf<GetPoolsResponse>();
+        expect(() => getPoolsResponseSchema.parse(response)).not.toThrow();
         expect(response.pools.length).toBeGreaterThan(0);
       });
     }
@@ -90,7 +90,7 @@ describe("RestClient", () => {
           offset: 0,
         });
 
-        expectTypeOf(response).toEqualTypeOf<GetPoolsResponse>();
+        expect(() => getPoolsResponseSchema.parse(response)).not.toThrow();
         expect(response.pools.length).toBeGreaterThan(0);
       });
     }
@@ -104,7 +104,7 @@ describe("RestClient", () => {
         offset: 10,
       });
 
-      expectTypeOf(response).toEqualTypeOf<GetPoolsResponse>();
+      expect(() => getPoolsResponseSchema.parse(response)).not.toThrow();
       expect(response.pools.length).toBe(10);
     });
 
@@ -118,7 +118,7 @@ describe("RestClient", () => {
         notPumpfunToken: true,
       });
 
-      expectTypeOf(response).toEqualTypeOf<GetPoolsResponse>();
+      expect(() => getPoolsResponseSchema.parse(response)).not.toThrow();
       expect(response.pools.length).toBe(10);
     });
   });
@@ -129,7 +129,7 @@ describe("RestClient", () => {
     it("should return the leaderboard", async () => {
       const response = await client.getLeaderboard();
 
-      expectTypeOf(response).toEqualTypeOf<LeaderboardResponse>();
+      expect(() => getLeaderboardResponseSchema.parse(response)).not.toThrow();
       expect(response.rankings.length).toBeGreaterThan(0);
 
       portfolioAddress = response.rankings[0].vault;
@@ -140,7 +140,7 @@ describe("RestClient", () => {
     it("should return the open portfolio", async () => {
       const response = await client.getPortfolio(portfolioAddress!, "open");
 
-      expectTypeOf(response).toEqualTypeOf<Portfolio>();
+      expect(() => portfolioSchema.parse(response)).not.toThrow();
     });
 
     it("should return the profitable portfolio", async () => {
@@ -149,7 +149,7 @@ describe("RestClient", () => {
         "profitable",
       );
 
-      expectTypeOf(response).toEqualTypeOf<Portfolio>();
+      expect(() => portfolioSchema.parse(response)).not.toThrow();
     });
   });
 
@@ -181,7 +181,7 @@ describe("RestClient", () => {
     it("should return no lists when no params are provided", async () => {
       const response = await client.getGems();
 
-      expectTypeOf(response).toEqualTypeOf<GetGemsResponse>();
+      expect(() => getGemsResponseSchema.parse(response)).not.toThrow();
       expect(response.new).toBeUndefined();
       expect(response.aboutToGraduate).toBeUndefined();
       expect(response.graduated).toBeUndefined();
@@ -192,7 +192,7 @@ describe("RestClient", () => {
         new: GEM_FILTERS,
       });
 
-      expectTypeOf(response).toEqualTypeOf<GetGemsResponse>();
+      expect(() => getGemsResponseSchema.parse(response)).not.toThrow();
       expect(response.new).toBeDefined();
     });
 
@@ -201,7 +201,7 @@ describe("RestClient", () => {
         aboutToGraduate: GEM_FILTERS,
       });
 
-      expectTypeOf(response).toEqualTypeOf<GetGemsResponse>();
+      expect(() => getGemsResponseSchema.parse(response)).not.toThrow();
       expect(response.aboutToGraduate).toBeDefined();
     });
 
@@ -210,7 +210,7 @@ describe("RestClient", () => {
         graduated: GEM_FILTERS,
       });
 
-      expectTypeOf(response).toEqualTypeOf<GetGemsResponse>();
+      expect(() => getGemsResponseSchema.parse(response)).not.toThrow();
       expect(response.graduated).toBeDefined();
     });
   });

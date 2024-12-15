@@ -1,9 +1,14 @@
-import { afterAll, describe, expect, expectTypeOf, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 
-import { type Pool } from "~/types/pools";
+import { type Pool, poolSchema } from "~/types/pools";
 
 import { RealtimeClient } from "./client";
-import { type GraduatedAction, type SwapAction } from "./types/actions";
+import {
+  type GraduatedAction,
+  graduatedActionSchema,
+  type SwapAction,
+  swapActionSchema,
+} from "./types/actions";
 
 describe("RealtimeClient", () => {
   describe("connection", () => {
@@ -91,14 +96,14 @@ describe("RealtimeClient", () => {
       await expect
         .poll(() => firstNewPool, { interval: 100, timeout: 30000 })
         .toBeTruthy();
-      expectTypeOf(firstNewPool!).toEqualTypeOf<Pool>();
+      expect(() => poolSchema.parse(firstNewPool)).not.toThrow();
     }, 30000);
 
     it("should receive a pool update", async () => {
       await expect
         .poll(() => firstPoolUpdate, { interval: 100, timeout: 30000 })
         .toBeTruthy();
-      expectTypeOf(firstPoolUpdate!).toEqualTypeOf<Pool>();
+      expect(() => poolSchema.parse(firstPoolUpdate)).not.toThrow();
     }, 30000);
 
     it("should receive a swap", async () => {
@@ -107,14 +112,16 @@ describe("RealtimeClient", () => {
       await expect
         .poll(() => firstSwap, { interval: 100, timeout: 30000 })
         .toBeTruthy();
-      expectTypeOf(firstSwap!).toEqualTypeOf<SwapAction>();
+      expect(() => swapActionSchema.parse(firstSwap)).not.toThrow();
     }, 30000);
 
     it.skip("should receive a graduated pool", async () => {
       await expect
         .poll(() => firstGraduatedPool, { interval: 100, timeout: 300000 })
         .toBeTruthy();
-      expectTypeOf(firstGraduatedPool!).toEqualTypeOf<GraduatedAction>();
+      expect(() =>
+        graduatedActionSchema.parse(firstGraduatedPool),
+      ).not.toThrow();
     }, 300000);
   });
 });

@@ -1,37 +1,42 @@
-import { type GetPoolsResponse } from "./pools";
+import { z } from "zod";
 
-export type GetGemsFilters = {
-  topHoldersPercentage?: number;
-  minDevLaunchedMints?: number;
-  maxDevLaunchedMints?: number;
-  numOfSocials?: number;
-  minLiquidity?: number;
-  maxLiquidity?: number;
-  minMcap?: number;
-  maxMcap?: number;
-  minVolume24h?: number;
-  maxVolume24h?: number;
-  minTxns24h?: number;
-  maxTxns24h?: number;
-  minBuys24h?: number;
-  maxBuys24h?: number;
-  minSells24h?: number;
-  maxSells24h?: number;
-  minTokenAge?: number;
-  maxTokenAge?: number;
-  minBondingCurve?: number;
-  maxBondingCurve?: number;
-  notPumpfunToken?: boolean;
-};
+import { getPoolsResponseSchema } from "./pools";
 
-export type GetGemsBody = {
-  new?: GetGemsFilters;
-  aboutToGraduate?: GetGemsFilters;
-  graduated?: GetGemsFilters;
-};
+export const getGemsFiltersSchema = z.object({
+  topHoldersPercentage: z.optional(z.number()),
+  minDevLaunchedMints: z.optional(z.number()),
+  maxDevLaunchedMints: z.optional(z.number()),
+  numOfSocials: z.optional(z.number()),
+  minLiquidity: z.optional(z.number()),
+  maxLiquidity: z.optional(z.number()),
+  minMcap: z.optional(z.number()),
+  maxMcap: z.optional(z.number()),
+  minVolume24h: z.optional(z.number()),
+  maxVolume24h: z.optional(z.number()),
+  minTxns24h: z.optional(z.number()),
+  maxTxns24h: z.optional(z.number()),
+  minBuys24h: z.optional(z.number()),
+  maxBuys24h: z.optional(z.number()),
+  minSells24h: z.optional(z.number()),
+  maxSells24h: z.optional(z.number()),
+  minTokenAge: z.optional(z.number()),
+  maxTokenAge: z.optional(z.number()),
+  minBondingCurve: z.optional(z.number()),
+  maxBondingCurve: z.optional(z.number()),
+  notPumpfunToken: z.optional(z.boolean()),
+});
+export type GetGemsFilters = z.infer<typeof getGemsFiltersSchema>;
 
-export type GetGemsResponse = {
-  new?: GetPoolsResponse;
-  aboutToGraduate?: GetPoolsResponse;
-  graduated?: GetPoolsResponse;
-};
+export const getGemsBodySchema = z.object({
+  new: z.optional(getGemsFiltersSchema),
+  aboutToGraduate: z.optional(getGemsFiltersSchema),
+  graduated: z.optional(getGemsFiltersSchema),
+});
+export type GetGemsBody = z.infer<typeof getGemsBodySchema>;
+
+export const getGemsResponseSchema = z.object({
+  new: z.optional(getPoolsResponseSchema),
+  aboutToGraduate: z.optional(getPoolsResponseSchema),
+  graduated: z.optional(getPoolsResponseSchema),
+});
+export type GetGemsResponse = z.infer<typeof getGemsResponseSchema>;

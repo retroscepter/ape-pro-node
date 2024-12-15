@@ -1,48 +1,65 @@
-import { type Pool } from "~/types/pools";
+import { z } from "zod";
 
-import { type Action } from "./actions";
+import { poolSchema } from "~/types/pools";
 
-type BaseMessage = {
-  type: string;
-};
+import { actionSchema } from "./actions";
 
-export type UpdatesMessageItem = {
-  type: "new" | "update";
-  pool: Pool;
-};
+export const updatesMessageItemSchema = z.object({
+  type: z.enum(["new", "update"]),
+  pool: poolSchema,
+});
+export type UpdatesMessageItem = z.infer<typeof updatesMessageItemSchema>;
 
-export type UpdatesMessage = BaseMessage & {
-  type: "updates";
-  data: UpdatesMessageItem[];
-};
+export const updatesMessageSchema = z.object({
+  type: z.literal("updates"),
+  data: z.array(updatesMessageItemSchema),
+});
+export type UpdatesMessage = z.infer<typeof updatesMessageSchema>;
 
-export type ActionsMessage = BaseMessage & {
-  type: "actions";
-  data: Action[];
-};
+export const actionsMessageSchema = z.object({
+  type: z.literal("actions"),
+  data: z.array(actionSchema),
+});
+export type ActionsMessage = z.infer<typeof actionsMessageSchema>;
 
-export type IncomingMessage = UpdatesMessage | ActionsMessage;
+export const incomingMessageSchema = z.discriminatedUnion("type", [
+  updatesMessageSchema,
+  actionsMessageSchema,
+]);
+export type IncomingMessage = z.infer<typeof incomingMessageSchema>;
 
-export type SubscribeRecentMessage = BaseMessage & {
-  type: "subscribe:recent";
-};
+export const subscribeRecentMessageSchema = z.object({
+  type: z.literal("subscribe:recent"),
+});
+export type SubscribeRecentMessage = z.infer<
+  typeof subscribeRecentMessageSchema
+>;
 
-export type UnsubscribeRecentMessage = BaseMessage & {
-  type: "unsubscribe:recent";
-};
+export const unsubscribeRecentMessageSchema = z.object({
+  type: z.literal("unsubscribe:recent"),
+});
+export type UnsubscribeRecentMessage = z.infer<
+  typeof unsubscribeRecentMessageSchema
+>;
 
-export type SubscribePoolsMessage = BaseMessage & {
-  type: "subscribe:pool";
-  pools: string[];
-};
+export const subscribePoolsMessageSchema = z.object({
+  type: z.literal("subscribe:pool"),
+  pools: z.array(z.string()),
+});
+export type SubscribePoolsMessage = z.infer<typeof subscribePoolsMessageSchema>;
 
-export type UnsubscribePoolsMessage = BaseMessage & {
-  type: "unsubscribe:pool";
-  pools: string[];
-};
+export const unsubscribePoolsMessageSchema = z.object({
+  type: z.literal("unsubscribe:pool"),
+  pools: z.array(z.string()),
+});
+export type UnsubscribePoolsMessage = z.infer<
+  typeof unsubscribePoolsMessageSchema
+>;
 
-export type OutgoingMessage =
-  | SubscribeRecentMessage
-  | UnsubscribeRecentMessage
-  | SubscribePoolsMessage
-  | UnsubscribePoolsMessage;
+export const outgoingMessageSchema = z.discriminatedUnion("type", [
+  subscribeRecentMessageSchema,
+  unsubscribeRecentMessageSchema,
+  subscribePoolsMessageSchema,
+  unsubscribePoolsMessageSchema,
+]);
+export type OutgoingMessage = z.infer<typeof outgoingMessageSchema>;

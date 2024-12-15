@@ -1,28 +1,32 @@
-import { type Pool } from "~/types/pools";
+import { z } from "zod";
 
-type BaseAction = {
-  type: string;
-};
+import { poolSchema } from "~/types/pools";
 
-export type SwapAction = BaseAction & {
-  type: "swap";
-  blockId: number;
-  txHash: string;
-  timestamp: string;
-  actionId: string;
-  traderAddress: string;
-  offerAsset: string;
-  offerAmount: number;
-  offerAssetUsdPrice: number;
-  returnAsset: string;
-  returnAmount: number;
-  returnAssetUsdPrice: number;
-  usdVolume: number;
-};
+export const swapActionSchema = z.object({
+  type: z.literal("swap"),
+  blockId: z.number(),
+  txHash: z.string(),
+  timestamp: z.string(),
+  actionId: z.string(),
+  traderAddress: z.string(),
+  offerAsset: z.string(),
+  offerAmount: z.number(),
+  offerAssetUsdPrice: z.number(),
+  returnAsset: z.string(),
+  returnAmount: z.number(),
+  returnAssetUsdPrice: z.number(),
+  usdVolume: z.number(),
+});
+export type SwapAction = z.infer<typeof swapActionSchema>;
 
-export type GraduatedAction = BaseAction & {
-  type: "graduated";
-  pool: Pool;
-};
+export const graduatedActionSchema = z.object({
+  type: z.literal("graduated"),
+  pool: poolSchema,
+});
+export type GraduatedAction = z.infer<typeof graduatedActionSchema>;
 
-export type Action = SwapAction | GraduatedAction;
+export const actionSchema = z.discriminatedUnion("type", [
+  swapActionSchema,
+  graduatedActionSchema,
+]);
+export type Action = z.infer<typeof actionSchema>;

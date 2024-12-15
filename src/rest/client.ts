@@ -3,7 +3,7 @@ import qs from "qs";
 
 import { API_URL } from "./const";
 import { type GetGemsBody, type GetGemsResponse } from "./types/gems";
-import { type LeaderboardResponse } from "./types/leaderboard";
+import { type GetLeaderboardResponse } from "./types/leaderboard";
 import { type GetPoolsParams, type GetPoolsResponse } from "./types/pools";
 import { type GetPortfolioType, type Portfolio } from "./types/portfolios";
 
@@ -22,7 +22,7 @@ export class RestClient {
   }
 
   async getLeaderboard() {
-    const response = await this.#axios.get<LeaderboardResponse>(
+    const response = await this.#axios.get<GetLeaderboardResponse>(
       "/v1/ape/leaderboard",
     );
     return response.data;
