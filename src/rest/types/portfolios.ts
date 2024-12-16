@@ -24,10 +24,10 @@ export const apePortfolioBalanceSchema = z.object({
 export type ApePortfolioBalance = z.infer<typeof apePortfolioBalanceSchema>;
 
 export const apePortfolioPnlSchema = z.object({
-  unrealized: z.number(),
-  realized: z.number(),
-  total: z.number(),
-  pctChange: z.number(),
+  unrealized: z.number().optional(),
+  realized: z.number().optional(),
+  total: z.number().optional(),
+  pctChange: z.number().optional(),
 });
 export type ApePortfolioPnl = z.infer<typeof apePortfolioPnlSchema>;
 
