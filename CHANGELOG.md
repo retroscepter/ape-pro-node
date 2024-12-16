@@ -1,5 +1,11 @@
 # ape.pro
 
+## 0.0.6
+
+### Patch Changes
+
+- c851112: Update types
+
 ## 0.0.5
 
 ### Patch Changes
