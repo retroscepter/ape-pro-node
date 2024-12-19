@@ -57,7 +57,7 @@ export const apePoolSchema = z.object({
   type: z.string(),
   baseAsset: apeAssetSchema,
   quoteAsset: apePartialAssetSchema,
-  audit: apePoolAuditSchema,
+  audit: apePoolAuditSchema.optional(),
   createdAt: z.string(),
   liquidity: z.number().optional(),
   stats5m: z.optional(apePoolStatsSchema),
