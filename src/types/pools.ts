@@ -6,19 +6,19 @@ export const apeAssetSchema = z.object({
   symbol: z.string(),
   icon: z.string().optional(),
   decimals: z.number(),
-  twitter: z.optional(z.string()),
-  website: z.optional(z.string()),
+  twitter: z.string().optional(),
+  website: z.string().optional(),
   dev: z.string().optional(),
   usdPrice: z.number().optional(),
   nativePrice: z.number().optional(),
   poolAmount: z.number().optional(),
   circSupply: z.number().optional(),
   totalSupply: z.number().optional(),
-  fdv: z.optional(z.number()),
-  mcap: z.optional(z.number()),
-  launchpad: z.optional(z.string()),
+  fdv: z.number().optional(),
+  mcap: z.number().optional(),
+  launchpad: z.string().optional(),
   tokenProgram: z.string(),
-  devMintCount: z.optional(z.number()),
+  devMintCount: z.number().optional(),
 });
 export type ApeAsset = z.infer<typeof apeAssetSchema>;
 
@@ -31,22 +31,22 @@ export const apePartialAssetSchema = apeAssetSchema.pick({
 export type ApePartialAsset = z.infer<typeof apePartialAssetSchema>;
 
 export const apePoolAuditSchema = z.object({
-  mintAuthorityDisabled: z.optional(z.boolean()),
-  freezeAuthorityDisabled: z.optional(z.boolean()),
-  topHoldersPercentage: z.optional(z.number()),
-  lpBurnedPercentage: z.optional(z.number()),
+  mintAuthorityDisabled: z.boolean().optional(),
+  freezeAuthorityDisabled: z.boolean().optional(),
+  topHoldersPercentage: z.number().optional(),
+  lpBurnedPercentage: z.number().optional(),
 });
 export type ApePoolAudit = z.infer<typeof apePoolAuditSchema>;
 
 export const apePoolStatsSchema = z.object({
-  priceChange: z.optional(z.number()),
-  buyVolume: z.optional(z.number()),
-  sellVolume: z.optional(z.number()),
-  numBuys: z.optional(z.number()),
-  numSells: z.optional(z.number()),
-  numTraders: z.optional(z.number()),
-  numBuyers: z.optional(z.number()),
-  numSellers: z.optional(z.number()),
+  priceChange: z.number().optional(),
+  buyVolume: z.number().optional(),
+  sellVolume: z.number().optional(),
+  numBuys: z.number().optional(),
+  numSells: z.number().optional(),
+  numTraders: z.number().optional(),
+  numBuyers: z.number().optional(),
+  numSellers: z.number().optional(),
 });
 export type ApePoolStats = z.infer<typeof apePoolStatsSchema>;
 
@@ -60,12 +60,13 @@ export const apePoolSchema = z.object({
   audit: apePoolAuditSchema.optional(),
   createdAt: z.string(),
   liquidity: z.number().optional(),
-  stats5m: z.optional(apePoolStatsSchema),
-  stats1h: z.optional(apePoolStatsSchema),
-  stats6h: z.optional(apePoolStatsSchema),
-  stats24h: z.optional(apePoolStatsSchema),
-  bondingCurve: z.optional(z.number()),
-  isUnreliable: z.optional(z.boolean()),
+  stats5m: apePoolStatsSchema.optional(),
+  stats1h: apePoolStatsSchema.optional(),
+  stats6h: apePoolStatsSchema.optional(),
+  stats24h: apePoolStatsSchema.optional(),
+  bondingCurve: z.number().optional(),
+  migratedTo: z.string().optional(),
+  isUnreliable: z.boolean().optional(),
   updatedAt: z.string(),
 });
 export type ApePool = z.infer<typeof apePoolSchema>;
